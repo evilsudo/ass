@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include "flanterm.h"
+#include "flanterm_backends/fb.h"
 #include "limine.h"
 
 // Set the base revision to 6, this is recommended as this is the latest
@@ -111,7 +113,25 @@ void kmain(void) {
 
     // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
-
-    // We're done, just hang...
+    // might be a little ugly, gonna put this into another thing soon
+    struct flanterm_context *ctx = flanterm_fb_init(
+        NULL,
+        NULL,
+        framebuffer-> address, framebuffer -> width, framebuffer -> height, framebuffer -> pitch,
+        framebuffer -> red_mask_size, framebuffer -> red_mask_shift,
+        framebuffer -> green_mask_size, framebuffer -> green_mask_shift,
+        framebuffer -> blue_mask_size, framebuffer -> blue_mask_shift,
+        NULL,
+        NULL, NULL,
+        NULL, NULL,
+        NULL, NULL,
+        NULL, 0, 0, 1,
+        0, 0,
+        0,
+        0,
+        true
+    );
+    const char msg[] = "Hello world\n";
+    flanterm_write(ctx, msg, sizeof(msg));
     hcf();
 }
