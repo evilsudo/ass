@@ -4,7 +4,9 @@
 #include "libs/limine.h"
 #include "libs/printf.h"
 #include "libs/flanterm/flanterm.h"
+#include "libs/flanterm/flanterm_backends/fb.h"
 #define NANOPRINTF_IMPLEMENTATION
+
 
 // Set the base revision to 6, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
@@ -130,9 +132,6 @@ void kmain(void) {
         0,
         true
     );
-    kprintf(ctx,"Hello World from kprintf");
-
-    // Fetch the first framebuffer
-
+    kprintf(ctx,"Hello World from kprintf/r/n");
     hcf();
 }
