@@ -1,14 +1,14 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-#include "flanterm.h"
-#include "flanterm_backends/fb.h"
-#include "limine.h"
+#include "libs/limine.h"
+#include "libs/printf.h"
+#include "libs/flanterm/flanterm.h"
+#define NANOPRINTF_IMPLEMENTATION
 
 // Set the base revision to 6, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
 // See specification for further info.
-
 __attribute__((used, section(".limine_requests")))
 static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(6);
 
@@ -22,6 +22,8 @@ static volatile struct limine_framebuffer_request framebuffer_request = {
     .id = LIMINE_FRAMEBUFFER_REQUEST_ID,
     .revision = 0
 };
+/* just the first framebuffer, temporary for now */
+
 
 // Finally, define the start and end markers for the Limine requests.
 // These can also be moved anywhere, to any .c file, as seen fit.
@@ -110,10 +112,7 @@ void kmain(void) {
      || framebuffer_request.response->framebuffer_count < 1) {
         hcf();
     }
-
-    // Fetch the first framebuffer.
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
-    // might be a little ugly, gonna put this into another thing soon
     struct flanterm_context *ctx = flanterm_fb_init(
         NULL,
         NULL,
@@ -131,7 +130,9 @@ void kmain(void) {
         0,
         true
     );
-    const char msg[] = "Hello world\n";
-    flanterm_write(ctx, msg, sizeof(msg));
+    kprintf(ctx,"Hello World from kprintf");
+
+    // Fetch the first framebuffer
+
     hcf();
 }
