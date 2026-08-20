@@ -9,7 +9,7 @@
 #define NANOPRINTF_IMPLEMENTATION
 #include "nanoprintf.h"
 static void kputc(int c, void *ctx) {
-    flanterm_write(ctx,(const char*)c,sizeof(c));
+    flanterm_write(ctx,(const char*)&c,sizeof(c));
 }
 
 void kprintf(struct flanterm_context *ctx,char toprint[]) {
