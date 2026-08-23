@@ -3,8 +3,7 @@
 #include <stdbool.h>
 #include "libs/limine.h"
 #include "libs/printf.h"
-#include "libs/flanterm/flanterm.h"
-#include "libs/flanterm/flanterm_backends/fb.h"
+#include "libs/shared.h"
 #define NANOPRINTF_IMPLEMENTATION
 
 
@@ -18,12 +17,6 @@ static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(6);
 // the compiler does not optimise them away, so, usually, they should
 // be made volatile or equivalent, _and_ they should be accessed at least
 // once or marked as used with the "used" attribute as done here.
-
-__attribute__((used, section(".limine_requests")))
-static volatile struct limine_framebuffer_request framebuffer_request = {
-    .id = LIMINE_FRAMEBUFFER_REQUEST_ID,
-    .revision = 0
-};
 /* just the first framebuffer, temporary for now */
 
 
@@ -93,12 +86,7 @@ int memcmp(const void *s1, const void *s2, size_t n) {
     return 0;
 }
 
-// Halt and catch fire function.
-static void hcf(void) {
-    for (;;) {
-        asm ("hlt");
-    }
-}
+// Halt and catch fire function.i
 
 // The following will be our kernel's entry point.
 // If renaming kmain() to something else, make sure to change the
@@ -108,30 +96,6 @@ void kmain(void) {
     if (LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision) == false) {
         hcf();
     }
-
-    // Ensure we got a framebuffer.
-    if (framebuffer_request.response == NULL
-     || framebuffer_request.response->framebuffer_count < 1) {
-        hcf();
-    }
-    struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
-    struct flanterm_context *ctx = flanterm_fb_init(
-        NULL,
-        NULL,
-        framebuffer-> address, framebuffer -> width, framebuffer -> height, framebuffer -> pitch,
-        framebuffer -> red_mask_size, framebuffer -> red_mask_shift,
-        framebuffer -> green_mask_size, framebuffer -> green_mask_shift,
-        framebuffer -> blue_mask_size, framebuffer -> blue_mask_shift,
-        NULL,
-        NULL, NULL,
-        NULL, NULL,
-        NULL, NULL,
-        NULL, 0, 0, 1,
-        0, 0,
-        0,
-        0,
-        true
-    );
-    kprintf(ctx,"Hello World from kprintf/r/n");
+    kprintf(&ctx, "%s","Hello world from (variadic) kprintf!!");
     hcf();
 }
