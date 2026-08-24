@@ -8,4 +8,6 @@ struct GdtSegment {
     uint8_t flags;
 };
 
-void writeGdt(uint8_t *target, struct GdtSegment segments[6]);
+void writeGdt(uint8_t *target, struct GdtSegment segments[5]);
+
+uint64_t encodeseg(struct GdtSegment source);

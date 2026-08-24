@@ -4,7 +4,10 @@
 #include "libs/limine.h"
 #include "libs/printf.h"
 #include "libs/shared.h"
+#include "libs/gdt.h"
 #define NANOPRINTF_IMPLEMENTATION
+
+extern void setGdt(uint16_t limit, uint32_t base);
 
 
 // Set the base revision to 6, this is recommended as this is the latest
@@ -12,6 +15,14 @@
 // See specification for further info.
 __attribute__((used, section(".limine_requests")))
 static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(6);
+
+struct GdtSegment seg_layout[5] = {
+    {.limit = 0x00000000, .base = 0, .access = 0x00, .flags = 0x0} /* null */,
+    {.limit = 0xFFFFF, .base = 0, .access = 0x9A, .flags = 0xA} /* kernel code */,
+    {.limit = 0xFFFFF, .base = 0, .access = 0x92, .flags = 0xC} /* kernel data */,
+    {.limit = 0xFFFFF, .base = 0, .access = 0xF2, .flags = 0xC} /* user code */,
+    {.limit = 0xFFFFF, .base = 0, .access = 0xFA, .flags = 0x0} /* user data */
+};
 
 // The Limine requests can be placed anywhere, but it is important that
 // the compiler does not optimise them away, so, usually, they should
@@ -97,5 +108,9 @@ void kmain(void) {
         hcf();
     }
     kprintf(&ctx, "%s","Hello world from (variadic) kprintf!!");
+    uint8_t addr_raw = 0xF0;
+    uint8_t *addr = &addr_raw;
+    writeGdt(addr,seg_layout);
+    setGdt(0xF0, 0x118); /* base, limit is just 5 * 8 for the number of 8-byte gdt segs */
     hcf();
 }

@@ -25,3 +25,8 @@ void kerror(char error[]) {
     /* Error has no info with it for now because imma impl that later */
     kprintf(&ctx,"%s%s","\033[31m",error);
 }
+
+void kdebug(char debug[]) {
+    /* just so i can differentiate */
+    kprintf(&ctx,"%s%s","\033[33m",debug);
+}
