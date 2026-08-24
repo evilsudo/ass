@@ -8,6 +8,11 @@
 #define NANOPRINTF_IMPLEMENTATION
 
 extern void setGdt(uint16_t limit, uint32_t base);
+static void hcf(void) {
+    for (;;) {
+        asm ("hlt");
+    }
+}
 
 
 // Set the base revision to 6, this is recommended as this is the latest

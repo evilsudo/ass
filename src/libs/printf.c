@@ -13,7 +13,7 @@ static void kputc(int c, void *ctx) {
     flanterm_write(ctx,(const char*)&c,sizeof(c));
 }
 
-void kprintf(struct flanterm_context *ctx,char toprint[], char const *fmt,...) {
+void kprintf(struct flanterm_context *ctx, char const *fmt,...) {
     va_list val;
     va_start(val,fmt);
     npf_pprintf(&kputc,ctx,fmt,val);

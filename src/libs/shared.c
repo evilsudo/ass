@@ -6,17 +6,9 @@ static volatile struct limine_framebuffer_request framebuffer_request = {
     .id = LIMINE_FRAMEBUFFER_REQUEST_ID,
     .revision = 0
 };
-static void hcf(void) {
-    for (;;) {
-        asm ("hlt");
-    }
-}
 
 struct flanterm_context *ctx;
 void GetFramebuffer() {
-    if (framebuffer_request.response == NULL || framebuffer_request.response->framebuffer_count < 1) {
-        hcf();
-    }
     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
     ctx = flanterm_fb_init(
         NULL,
