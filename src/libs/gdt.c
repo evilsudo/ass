@@ -3,7 +3,8 @@
 #include <stdint.h>
 
 uint64_t encodeseg(struct GdtSegment source) {
-    uint64_t *seg = 0;
+    uint64_t seg1 = 0xF0;
+    uint64_t *seg = &seg1;
     seg[0] = source.limit & 0xFF;
     seg[1] = (source.limit >> 8) & 0xFF;
     seg[6] = (source.limit >> 16) & 0x0F;

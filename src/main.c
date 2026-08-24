@@ -116,6 +116,6 @@ void kmain(void) {
     uint8_t addr_raw = 0xF0;
     uint8_t *addr = &addr_raw;
     writeGdt(addr,seg_layout);
-    setGdt(0xF0, 0x118); /* base, limit is just 5 * 8 for the number of 8-byte gdt segs */
+    setGdt(0x118, 0xF0); /* base, limit is just 5 * 8 for the number of 8-byte gdt segs */
     hcf();
 }

@@ -1,5 +1,4 @@
-.global setGdt
-
+global setGdt
 gdtr DW 0 ; For limit storage
      DQ 0 ; For base storage
 
