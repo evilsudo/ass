@@ -119,7 +119,7 @@ void kmain(void) {
     uint8_t addr_raw = 0xF0;
     uint8_t *addr = &addr_raw;
     writeGdt(addr,segments);
-    setGdt(0xF0, 0x138);
+    setGdt(0xF0,0x138);
     updateSegs();
     hcf();
 }

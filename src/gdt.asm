@@ -1,4 +1,4 @@
-sglobal setGdt
+global setGdt
 global updateSegs
 gdtr DW 0 ; For limit storage
      DQ 0 ; For base storage
