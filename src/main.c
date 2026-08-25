@@ -8,27 +8,30 @@
 #define NANOPRINTF_IMPLEMENTATION
 
 extern void setGdt(uint16_t limit, uint32_t base);
+extern void updateSegs();
 static void hcf(void) {
     for (;;) {
         asm ("hlt");
     }
 }
 
+uint64_t segments[] = {
+    0x0000000000000000, /* null */
+    0x00009a000000ffff, /* 16-bit code and data */
+    0x000093000000ffff,
+    0x00cf9a000000ffff, /* 32-bit code and data */
+    0x00cf93000000ffff,
+    0x00af9b000000ffff, /* 64-bit code and data */
+    0x00af93000000ffff,
+    0x00affb000000ffff, /* usermode code and data */
+    0x00aff3000000ffff,
+};
 
 // Set the base revision to 6, this is recommended as this is the latest
 // base revision described by the Limine boot protocol specification.
 // See specification for further info.
 __attribute__((used, section(".limine_requests")))
 static volatile uint64_t limine_base_revision[] = LIMINE_BASE_REVISION(6);
-
-struct GdtSegment seg_layout[5] = {
-    {.limit = 0x00000000, .base = 0, .access = 0x00, .flags = 0x0} /* null */,
-    {.limit = 0xFFFFF, .base = 0, .access = 0x9A, .flags = 0xA} /* kernel code */,
-    {.limit = 0xFFFFF, .base = 0, .access = 0x92, .flags = 0xC} /* kernel data */,
-    {.limit = 0xFFFFF, .base = 0, .access = 0xF2, .flags = 0xC} /* user code */,
-    {.limit = 0xFFFFF, .base = 0, .access = 0xFA, .flags = 0x0} /* user data */
-};
-
 // The Limine requests can be placed anywhere, but it is important that
 // the compiler does not optimise them away, so, usually, they should
 // be made volatile or equivalent, _and_ they should be accessed at least
@@ -115,7 +118,8 @@ void kmain(void) {
     kprintf(&ctx, "%s","Hello world from (variadic) kprintf!!");
     uint8_t addr_raw = 0xF0;
     uint8_t *addr = &addr_raw;
-    writeGdt(addr,seg_layout);
-    setGdt(0x118, 0xF0); /* base, limit is just 5 * 8 for the number of 8-byte gdt segs */
+    writeGdt(addr,segments);
+    setGdt(0xF0, 0x138);
+    updateSegs();
     hcf();
 }
